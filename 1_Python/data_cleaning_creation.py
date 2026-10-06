@@ -1,11 +1,10 @@
-import numpy as np
 import pandas as pd
 
 # Data Cleaning
 # Step 1: load in the data and preview
 df_raw = pd.read_csv('ecommerce_sales_dataset.csv')
 df_raw.info()
-df_raw.head(5)
+print(df_raw.head(5))
 
 # Step 2: Create copy to protect source
 df_cleaned = df_raw.copy()
@@ -17,7 +16,7 @@ df_cleaned.columns = (df_cleaned.columns
                       .str.replace(' ', '_')
                       .str.replace('%', 'pct'))
 
-df_cleaned.head(5)
+print(df_cleaned.head(5))
 
 # Step 4: Clean up the data within the colunms
 # Ensure proper datetime formatting for order_date column
@@ -41,7 +40,7 @@ final_rows = len(df_cleaned)
 if initial_rows != final_rows:
     print(f"⚠️ Removed {initial_rows - final_rows} absolute duplicate rows.")
 
-df_cleaned.head(5)
+print(df_cleaned.head(5))
 
 
 # Creating star schema
@@ -202,7 +201,7 @@ print("--------------------------")
 print("Everything is built and ready for the database")
 
 
-### Saving data and connecting to PostpreSQL
+### Saving data
 # Step 1: Save to CSV
 dim_customers.to_csv('dim_customers.csv', index=False)
 dim_geography.to_csv('dim_geography.csv', index=False)
