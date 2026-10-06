@@ -1,3 +1,6 @@
+import numpy as np
+import pandas as pd
+
 # Data Cleaning
 # Step 1: load in the data and preview
 df_raw = pd.read_csv('ecommerce_sales_dataset.csv')
