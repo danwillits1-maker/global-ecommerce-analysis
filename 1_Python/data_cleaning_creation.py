@@ -1,31 +1,10 @@
-# %% [markdown]
-# # Global E Commerce Project
-
-# %% [markdown]
-# ### Initial Set-up
-
-# %%
-import numpy as np
-from sqlalchemy import create_engine
-import pandas as pd
-%pip install pandas sqlalchemy psycopg2-binary ipykernel
-
-
-# pip freeze > requirements.txt (run in terminal)
-
-# %% [markdown]
-# ### Data Cleaning
-
-# %%
+# Data Cleaning
 # Step 1: load in the data and preview
-
 df_raw = pd.read_csv('ecommerce_sales_dataset.csv')
 df_raw.info()
 df_raw.head(5)
 
-# %%
 # Step 2: Create copy to protect source
-
 df_cleaned = df_raw.copy()
 
 # Step 3: Fix irregular column header formatting
@@ -37,7 +16,6 @@ df_cleaned.columns = (df_cleaned.columns
 
 df_cleaned.head(5)
 
-# %%
 # Step 4: Clean up the data within the colunms
 # Ensure proper datetime formatting for order_date column
 df_cleaned['order_date'] = pd.to_datetime(
@@ -62,13 +40,9 @@ if initial_rows != final_rows:
 
 df_cleaned.head(5)
 
-# %% [markdown]
-# ### Creating star schema
 
-# %% [markdown]
+# Creating star schema
 # Identified 6 key dimensions that I want to pull out; geography, customer, product, shipping/region, calender, and order status. This seperated data into all different categories allowing for proper cross filtering analysis later.
-
-# %%
 # STEP 1. GEOGRAPHY DIMENSION
 dim_geography = (
     df_cleaned[['region', 'country']]
@@ -77,7 +51,6 @@ dim_geography = (
 )
 dim_geography['geography_key'] = dim_geography.index + 1
 dim_geography = dim_geography[['geography_key', 'region', 'country']]
-
 
 # STEP 2. CUSTOMER DIMENSION
 dim_customers = (
@@ -158,7 +131,7 @@ dim_statuses = dim_statuses[[
 print("📊 'dim_statuses' successfully engineered for the database layer:")
 print(dim_statuses.to_string(index=False))
 
-# %%
+
 # STEP 6: FACT TABLE
 
 # 1. Start with a fresh base from your cleaned data
@@ -225,10 +198,8 @@ print(f"✅ fact_sales created!    Rows: {len(fact_sales)}")
 print("--------------------------")
 print("Everything is built and ready for the database")
 
-# %% [markdown]
-# ### Saving data and connecting to PostpreSQL
 
-# %%
+### Saving data and connecting to PostpreSQL
 # Step 1: Save to CSV
 dim_customers.to_csv('dim_customers.csv', index=False)
 dim_geography.to_csv('dim_geography.csv', index=False)
@@ -239,34 +210,3 @@ dim_statuses.to_csv('dim_statuses.csv', index=False)
 fact_sales.to_csv('fact_sales.csv', index=False)
 
 print("💾 All 7 CSV files saved locally!")
-
-# %%
-
-# 1. Put your database details here
-DB_USER = 'postgres'
-DB_PASSWORD = 'SQL123'
-DB_HOST = 'localhost'
-DB_PORT = '5432'
-DB_NAME = 'global_e_commerce'
-
-# 2. Connect to your PostgreSQL database (🔥 FIXED LINE HERE)
-connection_string = f"postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
-engine = create_engine(connection_string)
-
-# 3. Push the exact same tables into PostgreSQL
-dim_customers.to_sql('dim_customers', con=engine,
-                     if_exists='replace', index=False)
-dim_geography.to_sql('dim_geography', con=engine,
-                     if_exists='replace', index=False)
-dim_products.to_sql('dim_products', con=engine,
-                    if_exists='replace', index=False)
-dim_shipping.to_sql('dim_shipping', con=engine,
-                    if_exists='replace', index=False)
-dim_calendar.to_sql('dim_calendar', con=engine,
-                    if_exists='replace', index=False)
-dim_statuses.to_sql('dim_statuses', con=engine,
-                    if_exists='replace', index=False)
-fact_sales.to_sql('fact_sales', con=engine, if_exists='replace', index=False)
-
-print("🔌 Part 2: All 7 tables uploaded to PostgreSQL!")
-print("🎉 All done! Your pipeline is completely finished.")
